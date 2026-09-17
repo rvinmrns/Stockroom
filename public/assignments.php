@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require dirname(__DIR__) . '/app/bootstrap.php';
 require dirname(__DIR__) . '/app/auth.php';
+require_once dirname(__DIR__) . '/app/assignment-date.php';
 if (!$isAdmin) {
     if (wantsJson()) { jsonError('Only admins can access item assignments.', 403); }
     http_response_code(403); exit('Only admins can access item assignments.');
@@ -35,11 +36,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new InvalidArgumentException($label . ' is required and must be at most ' . $limit . ' bytes.');
             }
         }
-        $date = DateTimeImmutable::createFromFormat('!Y-m-d', $values['date_received']);
-        if (!$date || $date->format('Y-m-d') !== $values['date_received'] || $values['date_received'] < '1000-01-01') {
-            throw new InvalidArgumentException('Enter a valid date received.');
+        $date = parseAssignmentDate($values['date_received']);
+        if (!$date) {
+            throw new InvalidArgumentException('Enter a valid date received in DD-MM-YYYY format, for example 16-09-2026.');
         }
-        $parameters = array_map(static fn($key)=>$values[$key], array_keys($fields));
+        $parameters = array_map(static fn($key)=>$key === 'date_received' ? $date->format('Y-m-d') : $values[$key], array_keys($fields));
         if ($editId) {
             $statement = $db->prepare('UPDATE item_assignments SET brand=?,description=?,unit=?,serial_number=?,employee_name=?,position=?,office=?,date_received=? WHERE id=?');
             $parameters[] = $editId;
@@ -74,6 +75,7 @@ if (isset($_GET['edit'])) {
         $values = [];
     } elseif (!$error) {
         $values = $assignmentToEdit;
+        $values['date_received'] = DateTimeImmutable::createFromFormat('!Y-m-d', $assignmentToEdit['date_received'])->format('d-m-Y');
     }
 }
 $assignments = $db->query('SELECT * FROM item_assignments ORDER BY id DESC')->fetchAll();

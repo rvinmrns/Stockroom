@@ -20,7 +20,7 @@
 <label>Employee name<input name="employee_name" maxlength="160" required value="<?= e($values['employee_name'] ?? '') ?>" placeholder="Full name"></label>
 <label>Position<input name="position" maxlength="160" required value="<?= e($values['position'] ?? '') ?>" placeholder="Employee position"></label>
 <label>Office<input name="office" maxlength="160" required value="<?= e($values['office'] ?? '') ?>" placeholder="Assigned office"></label>
-<label>Date received<input type="date" name="date_received" min="1000-01-01" max="9999-12-31" required value="<?= e($values['date_received'] ?? '') ?>"></label>
+<label>Date received<input type="text" name="date_received" data-date-input inputmode="numeric" maxlength="10" placeholder="DD-MM-YYYY" title="Enter the date as DD-MM-YYYY." required value="<?= e($values['date_received'] ?? '') ?>"></label>
 </div><div class="form-footer"><span>Serial numbers are checked against saved assignments.</span><?php if ($editId): ?><a class="button" href="assignments.php">Cancel</a><?php endif; ?><button class="button primary" type="submit"><?= $editId ? 'Save changes' : 'Save' ?></button></div>
 </form></section>
 <section class="panel"><div class="panel-heading"><h2>Saved assignments</h2><span class="count"><?= count($assignments) ?> records</span></div>
@@ -28,7 +28,7 @@
 <?php foreach ($assignments as $assignment): ?><tr>
 <td class="assignment-item"><strong><?= e($assignment['brand']) ?></strong><p><?= nl2br(e($assignment['description'])) ?></p></td>
 <td><?= e($assignment['unit']) ?></td><td><?= e($assignment['serial_number']) ?></td><td><?= e($assignment['employee_name']) ?></td>
-<td class="assignment-item"><strong><?= e($assignment['position']) ?></strong><p><?= e($assignment['office']) ?></p></td><td><?= e($assignment['date_received']) ?></td>
+<td class="assignment-item"><strong><?= e($assignment['position']) ?></strong><p><?= e($assignment['office']) ?></p></td><td><?= e(DateTimeImmutable::createFromFormat('!Y-m-d', $assignment['date_received'])->format('d-m-Y')) ?></td>
 <td><a class="button" href="assignments.php?edit=<?= (int)$assignment['id'] ?>" aria-label="Edit assignment <?= e($assignment['serial_number']) ?>">Edit</a></td>
 </tr><?php endforeach; ?>
 <?php if (!$assignments): ?><tr><td colspan="7"><div class="empty-state"><h3>No assignments yet</h3><p>Complete the form above to register the first item.</p></div></td></tr><?php endif; ?>

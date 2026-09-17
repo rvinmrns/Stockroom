@@ -1,5 +1,26 @@
 (() => {
   let busy = false;
+  document.addEventListener('input', event => {
+    const input = event.target;
+    if (!(input instanceof HTMLInputElement) || !input.matches('[data-date-input]') || event.isComposing) return;
+    const raw = input.value;
+    const caret = input.selectionStart ?? raw.length;
+    const digitsBeforeCaret = raw.slice(0, caret).replace(/\D/g, '').length;
+    const digits = raw.replace(/\D/g, '').slice(0, 8);
+    const deleting = event.inputType?.startsWith('delete');
+    let formatted = digits.slice(0, 2);
+    if (digits.length > 2 || (digits.length === 2 && !deleting)) formatted += '-' + digits.slice(2, 4);
+    if (digits.length > 4 || (digits.length === 4 && !deleting)) formatted += '-' + digits.slice(4);
+    input.value = formatted;
+    let position = 0;
+    let seen = 0;
+    while (position < formatted.length && seen < digitsBeforeCaret) {
+      if (/\d/.test(formatted[position])) seen++;
+      position++;
+    }
+    if (!deleting && formatted[position] === '-') position++;
+    input.setSelectionRange(position, position);
+  });
   function notice(message, error = false) {
     document.querySelector('#request-notice')?.remove();
     const node = document.createElement('div');
