@@ -1,0 +1,12 @@
+/data/*.sqlite
+/data/*.sqlite-*
+/data/products-before-column-removal-*.json
+/data/*
+!/data/README.md
+!/data/.gitkeep
+.env
+.env.*
+!.env.example
+*.log
+/vendor/
+/node_modules/
