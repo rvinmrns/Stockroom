@@ -8,9 +8,10 @@
 <?php if ($error): ?><div class="notice error" role="alert"><?= e($error) ?></div><?php endif; ?>
 <?php if ($flash): ?><div class="notice success" role="status"><?= e($flash) ?></div><?php endif; ?>
 <section class="panel product-form">
-<div class="panel-heading"><h2>Item and employee information</h2><span class="count">All fields required</span></div>
+<div class="panel-heading"><h2><?= $editId ? 'Edit assignment' : 'Item and employee information' ?></h2><span class="count">All fields required</span></div>
 <form method="post" action="assignments.php">
-<input type="hidden" name="csrf" value="<?= e($_SESSION['csrf']) ?>"><input type="hidden" name="action" value="save_assignment">
+<input type="hidden" name="csrf" value="<?= e($_SESSION['csrf']) ?>"><input type="hidden" name="action" value="<?= $editId ? 'update_assignment' : 'save_assignment' ?>">
+<?php if ($editId): ?><input type="hidden" name="id" value="<?= (int)$editId ?>"><?php endif; ?>
 <div class="form-grid assignment-fields">
 <label>Brand<input name="brand" maxlength="120" required value="<?= e($values['brand'] ?? '') ?>" placeholder="e.g. Dell"></label>
 <label>Unit<input name="unit" maxlength="60" required value="<?= e($values['unit'] ?? '') ?>" placeholder="e.g. piece, set, unit"></label>
@@ -20,16 +21,17 @@
 <label>Position<input name="position" maxlength="160" required value="<?= e($values['position'] ?? '') ?>" placeholder="Employee position"></label>
 <label>Office<input name="office" maxlength="160" required value="<?= e($values['office'] ?? '') ?>" placeholder="Assigned office"></label>
 <label>Date received<input type="date" name="date_received" min="1000-01-01" max="9999-12-31" required value="<?= e($values['date_received'] ?? '') ?>"></label>
-</div><div class="form-footer"><span>Serial numbers are checked against saved assignments.</span><button class="button primary" type="submit">Save</button></div>
+</div><div class="form-footer"><span>Serial numbers are checked against saved assignments.</span><?php if ($editId): ?><a class="button" href="assignments.php">Cancel</a><?php endif; ?><button class="button primary" type="submit"><?= $editId ? 'Save changes' : 'Save' ?></button></div>
 </form></section>
 <section class="panel"><div class="panel-heading"><h2>Saved assignments</h2><span class="count"><?= count($assignments) ?> records</span></div>
-<div class="table-wrap"><table><thead><tr><th>Item</th><th>Unit</th><th>Serial number</th><th>Employee</th><th>Position and office</th><th>Date received</th></tr></thead><tbody>
+<div class="table-wrap"><table><thead><tr><th>Item</th><th>Unit</th><th>Serial number</th><th>Employee</th><th>Position and office</th><th>Date received</th><th>Actions</th></tr></thead><tbody>
 <?php foreach ($assignments as $assignment): ?><tr>
 <td class="assignment-item"><strong><?= e($assignment['brand']) ?></strong><p><?= nl2br(e($assignment['description'])) ?></p></td>
 <td><?= e($assignment['unit']) ?></td><td><?= e($assignment['serial_number']) ?></td><td><?= e($assignment['employee_name']) ?></td>
 <td class="assignment-item"><strong><?= e($assignment['position']) ?></strong><p><?= e($assignment['office']) ?></p></td><td><?= e($assignment['date_received']) ?></td>
+<td><a class="button" href="assignments.php?edit=<?= (int)$assignment['id'] ?>" aria-label="Edit assignment <?= e($assignment['serial_number']) ?>">Edit</a></td>
 </tr><?php endforeach; ?>
-<?php if (!$assignments): ?><tr><td colspan="6"><div class="empty-state"><h3>No assignments yet</h3><p>Complete the form above to register the first item.</p></div></td></tr><?php endif; ?>
+<?php if (!$assignments): ?><tr><td colspan="7"><div class="empty-state"><h3>No assignments yet</h3><p>Complete the form above to register the first item.</p></div></td></tr><?php endif; ?>
 </tbody></table></div></section>
 </div></main>
 <script src="app.js"></script></body></html>
