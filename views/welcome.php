@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DENR MIMAROPA · Choose your account</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="accounts.css"></head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stockroom · Choose your account</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="accounts.css"></head>
 <body class="login-body welcome-body"><section class="panel welcome-panel">
-<a class="brand" href="stockroom.php"><span class="brand-name">DENR MIMAROPA</span></a>
-<header class="welcome-heading"><span class="eyebrow">YOUR INVENTORY WORKSPACE</span><h1>Welcome to DENR MIMAROPA</h1><p>Choose your account type to log in or sign up.</p></header>
+<a class="brand" href="stockroom.php"><span class="brand-name">Stockroom</span></a>
+<header class="welcome-heading"><span class="eyebrow">YOUR INVENTORY WORKSPACE</span><h1>Welcome to Stockroom</h1><p>Choose your account type to log in or sign up.</p></header>
 <div class="portal-grid">
 <?php foreach (['user' => 'User'] as $value => $label): ?>
 <section class="portal-card" aria-labelledby="portal-<?= e($value) ?>">

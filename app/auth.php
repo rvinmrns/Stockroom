@@ -74,11 +74,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($authAction, ['setup', 'si
             $db->prepare('INSERT INTO users (username,password_hash,role) VALUES (?,?,?)')->execute([$username, $hash, $signupRole]);
             $userId = (int) $db->lastInsertId();
         } else {
-            $statement = $db->prepare('SELECT * FROM users WHERE username=? AND active=1');
+            $statement = $db->prepare('SELECT * FROM users WHERE username=?');
             $statement->execute([trim((string) ($_POST['username'] ?? ''))]);
             $account = $statement->fetch();
             if (!$account || !password_verify((string) ($_POST['password'] ?? ''), $account['password_hash'])) {
                 throw new InvalidArgumentException('Invalid username or password.');
+            }
+            if (!(int) $account['active']) {
+                throw new InvalidArgumentException('Your account has been deactivated. Please contact the administrator.');
             }
             $userId = (int) $account['id'];
         }

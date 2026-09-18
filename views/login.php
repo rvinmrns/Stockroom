@@ -3,14 +3,14 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>DENR MIMAROPA · <?= $isSignup ? 'Sign up' : 'Sign in' ?></title>
+    <title>Stockroom · <?= $isSignup ? 'Sign up' : 'Sign in' ?></title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="accounts.css">
 </head>
 <body class="login-body">
 <section class="panel login-panel">
-    <a class="brand" href="stockroom.php"><span class="brand-name">DENR MIMAROPA</span></a>
-    <h1><?= $needsSetup ? 'Welcome to DENR MIMAROPA' : ($portalRole !== '' ? e($roles[$portalRole]) . ($isSignup ? ' sign up' : ' login') : ($isSignup ? 'Create your account' : 'Welcome back')) ?></h1>
+    <a class="brand" href="stockroom.php"><span class="brand-name">Stockroom</span></a>
+    <h1><?= $needsSetup ? 'Welcome to Stockroom' : ($portalRole !== '' ? e($roles[$portalRole]) . ($isSignup ? ' sign up' : ' login') : ($isSignup ? 'Create your account' : 'Welcome back')) ?></h1>
     <p><?= $needsSetup ? 'Create your first admin account to get started.' : ($isSignup ? 'Create a user account to browse inventory.' : 'Sign in to access your inventory workspace.') ?></p>
     <?php if ($authError): ?><div class="notice error" role="alert"><?= e($authError) ?></div><?php endif; ?>
     <form method="post" action="stockroom.php?<?= e(($isSignup ? 'signup=1' : 'login=1') . ($portalQuery !== '' ? '&' . $portalQuery : '')) ?>" class="account-form">

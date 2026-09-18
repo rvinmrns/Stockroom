@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DENR MIMAROPA · Item assignments</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="accounts.css"></head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stockroom · Item assignments</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="accounts.css"></head>
 <body>
 <?php $sidebarPage = 'assignments'; require __DIR__ . '/partials/sidebar.php'; ?>
 <main><div class="accounts-page">

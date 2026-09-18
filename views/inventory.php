@@ -3,24 +3,25 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>DENR MIMAROPA · <?= e($workspaceTitle) ?></title>
+    <title>Stockroom · <?= e($workspaceTitle) ?></title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="accounts.css">
 </head>
 <body class="role-<?= e($currentUser['role']) ?>">
-<?php $sidebarPage = 'inventory'; require __DIR__ . '/partials/sidebar.php'; ?>
+<?php $sidebarPage = $userStockPage ? $status : 'inventory'; require __DIR__ . '/partials/sidebar.php'; ?>
 <main>
     <header class="topbar"><?php require __DIR__ . '/partials/account-menu.php'; ?><span class="today"><?= e(date('M j, Y')) ?></span></header>
     <div class="content">
         <div class="heading"><div><div class="eyebrow"><?= e($roles[$currentUser['role']]) ?> WORKSPACE</div><h1><?= e($workspaceTitle) ?></h1><p><?= e($workspaceDescription) ?></p></div><?php if ($canManageInventory): ?><a class="button primary" href="?add=1">＋ Add product</a><?php endif; ?></div>
         <?php if ($flash): ?><div class="notice success" role="status"><?= e($flash) ?></div><?php endif; ?>
         <?php if ($error): ?><div class="notice error" role="alert"><?= e($error) ?></div><?php endif; ?>
-        <?php if (!$isAdmin): ?>
+        <?php if (!$isAdmin && !$userStockPage): ?>
         <section class="role-welcome" aria-label="Your workspace">
             <div><span class="role-label">YOUR PRODUCT DIRECTORY</span><h2>Hello, <?= e($currentUser['username']) ?>.</h2><p>Explore the catalog below. Stock badges help you see what is available at a glance.</p></div>
             <div class="role-shortcuts"><a class="button secondary" href="stockroom.php?status=low">View low stock · <?= e($stats['low']) ?></a><a class="button secondary" href="stockroom.php?status=out">Out of stock</a></div>
         </section>
         <?php endif; ?>
+        <?php if (!$userStockPage): ?>
         <section class="stats" aria-label="Inventory overview">
             <article class="stat"><span>Total products <span class="stat-icon">▦</span></span><strong><?= number_format((int) $stats['products']) ?></strong><small>Unique items in your catalog</small></article>
             <article class="stat"><span>Units in stock <span class="stat-icon">▤</span></span><strong><?= number_format((int) $stats['units']) ?></strong><small>Across all your products</small></article>
@@ -28,6 +29,7 @@
             <article class="stat"><span>Low-stock items <span class="stat-icon warning">!</span></span><strong><?= number_format((int) $stats['low']) ?></strong><small><span class="small-dot"></span> At or below minimum stock</small></article>
         </section>
 
+        <?php endif; ?>
         <?php if ($formOpen): ?>
         <section class="panel product-form">
             <div class="panel-heading"><h2><?= !empty($editing['id']) ? 'Edit product' : 'Add a product' ?></h2><a href="stockroom.php" class="text-link">Cancel</a></div>
@@ -45,9 +47,10 @@
         </section>
         <?php endif; ?>
 
+        <?php if ($canManageInventory || $userStockPage): ?>
         <section class="panel">
             <div class="panel-heading"><div class="catalog-title"><h2><?= $canManageInventory ? 'Product inventory' : 'Browse products' ?></h2><span class="count"><?= count($products) ?> items</span></div><a class="button secondary" href="?<?= e(http_build_query(['q' => $search, 'status' => $status, 'export' => 'csv'])) ?>">↓ Export CSV</a></div>
-            <form class="filters" method="get"><div class="search-box"><span aria-hidden="true">⌕</span><input type="search" name="q" aria-label="Search products" placeholder="Search by product name…" value="<?= e($search) ?>"></div><select name="status" aria-label="Stock status"><option value="all">All stock levels</option><option value="low" <?= $status === 'low' ? 'selected' : '' ?>>Low stock</option><option value="out" <?= $status === 'out' ? 'selected' : '' ?>>Out of stock</option></select><button class="button secondary">Filter</button><?php if ($search !== '' || $status !== 'all'): ?><a class="text-link" href="stockroom.php">Clear</a><?php endif; ?></form>
+            <form class="filters" method="get"><div class="search-box"><span aria-hidden="true">⌕</span><input type="search" name="q" aria-label="Search products" placeholder="Search by product name…" value="<?= e($search) ?>"></div><?php if ($isAdmin): ?><select name="status" aria-label="Stock status"><option value="all">All stock levels</option><option value="low" <?= $status === 'low' ? 'selected' : '' ?>>Low stock</option><option value="out" <?= $status === 'out' ? 'selected' : '' ?>>Out of stock</option></select><?php else: ?><input type="hidden" name="status" value="<?= e($status) ?>"><?php endif; ?><button class="button secondary">Filter</button><?php if ($search !== '' || $status !== 'all'): ?><a class="text-link" href="stockroom.php?status=<?= e($isAdmin ? 'all' : $status) ?>">Clear</a><?php endif; ?></form>
             <?php if (!$canManageInventory): ?>
                 <?php require __DIR__ . '/partials/catalog.php'; ?>
             <?php else: ?>
@@ -65,6 +68,7 @@
             <?php endif; ?>
             <div class="table-footer">Showing <?= count($products) ?> of <?= e($stats['products']) ?> products<span>Made for a more organized day.</span></div>
         </section>
+        <?php endif; ?>
         <footer class="page-footer"><span class="small-dot green"></span> <?= $canManageInventory ? 'Your inventory is saved automatically after every change.' : 'Inventory is maintained by your admin.' ?></footer>
     </div>
 </main>

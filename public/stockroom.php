@@ -56,6 +56,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $search = trim((string) ($_GET['q'] ?? ''));
 $status = (string) ($_GET['status'] ?? 'all');
+if (!in_array($status, ['all', 'low', 'out'], true)) { $status = 'all'; }
+$userStockPage = !$isAdmin && $status !== 'all';
 $where = [];
 $params = [];
 if ($search !== '') {
@@ -63,12 +65,13 @@ if ($search !== '') {
     $term = '%' . str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $search) . '%';
     $params = [$term];
 }
-if ($status === 'low') { $where[] = 'quantity <= minimum_stock'; }
+if ($status === 'low') { $where[] = $isAdmin ? 'quantity <= minimum_stock' : 'quantity > 0 AND quantity <= minimum_stock'; }
 if ($status === 'out') { $where[] = 'quantity = 0'; }
 $statement = $db->prepare('SELECT * FROM products' . ($where ? ' WHERE ' . implode(' AND ', $where) : '') . ' ORDER BY name');
 $statement->execute($params);
 $products = $statement->fetchAll();
 $stats = $db->query('SELECT COUNT(*) AS products, COALESCE(SUM(quantity),0) AS units, COALESCE(SUM(quantity = 0),0) AS out_stock, COALESCE(SUM(quantity <= minimum_stock),0) AS low FROM products')->fetch();
+if (!$isAdmin) { $stats['low'] = (int)$stats['low'] - (int)$stats['out_stock']; }
 if (($_GET['export'] ?? '') === 'csv') {
     header('Content-Type: text/csv; charset=utf-8');
     header('Content-Disposition: attachment; filename="inventory-' . date('Y-m-d') . '.csv"');
@@ -96,6 +99,10 @@ if ($canManageInventory && $error && in_array($_POST['action'] ?? '', ['create',
 }
 $workspaceTitle = $isAdmin ? 'Inventory' : 'Inventory catalog';
 $workspaceDescription = $isAdmin ? 'Manage products, track stock, and review accounts.' : 'Find products, check availability, and export the inventory you need.';
+if ($userStockPage) {
+    $workspaceTitle = $status === 'low' ? 'Low stock' : 'Out of stock';
+    $workspaceDescription = $status === 'low' ? 'Items with available units at or below minimum stock.' : 'Items with no units currently available.';
+}
 beginPage();
 require dirname(__DIR__) . '/views/inventory.php';
 endPage(['page'=>'inventory', 'user'=>$currentUser, 'products'=>$products, 'stats'=>$stats]);
